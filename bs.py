@@ -4388,8 +4388,16 @@ if st.session_state.current_page == "Case Search":
                                     for post in st.session_state.reddit_results[:5]]
                         reddit_context = "Top Reddit discussions:\n" + "\n".join(top_posts) + "\n"
                     
-                    # Get YouTube count
-                    youtube_count = st.session_state.get('youtube_count', 0)
+                    # Get YouTube count safely
+                    youtube_count_from_session = st.session_state.get('youtube_count', 0)
+                    if isinstance(youtube_count_from_session, dict):
+                        youtube_count = youtube_count_from_session.get('data', 0) if youtube_count_from_session else 0
+                    else:
+                        youtube_count = youtube_count_from_session or 0
+
+                    # Make sure youtube_count is an integer
+                    if not isinstance(youtube_count, int):
+                        youtube_count = 0
                     
                     # Get case search term
                     case_search = st.session_state.get('search_query', 'Unknown Case')
