@@ -8,9 +8,6 @@ import os
 import feedparser
 import random
 
-st.write("Debug: Code version 2024-12-XX")  # Use today's date
-
-
 # ============ DATA CACHING HELPERS ============
 def cache_with_expiry(key, data, hours=24):
     """Cache data with expiration timestamp"""
@@ -49,6 +46,9 @@ st.set_page_config(
   page_title="Shorthand Studios - Content Intelligence Platform",
   layout="wide"
 )
+
+st.write("Debug: Code version 2024-12-XX")  # Move it here
+
 
 # Enhanced CSS for Shorthand Studios website styling
 st.markdown("""
