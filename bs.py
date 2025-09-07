@@ -8,6 +8,9 @@ import os
 import feedparser
 import random
 
+st.write("Debug: Code version 2024-12-XX")  # Use today's date
+
+
 # ============ DATA CACHING HELPERS ============
 def cache_with_expiry(key, data, hours=24):
     """Cache data with expiration timestamp"""
