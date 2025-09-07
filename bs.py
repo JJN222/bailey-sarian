@@ -4371,9 +4371,15 @@ if st.session_state.current_page == "Case Search":
                     
                     # Build wiki context from wikidata results
                     wiki_context = ""
-                    if hasattr(st.session_state, 'wikidata_results') and st.session_state.wikidata_results:
-                        wiki_entries = [f"- {r['label']}: {r['description']}" for r in st.session_state.wikidata_results[:3]]
-                        wiki_context = "Wikipedia/Wikidata entries found:\n" + "\n".join(wiki_entries) + "\n"
+                    try:
+                        if hasattr(st.session_state, 'wikidata_results') and st.session_state.wikidata_results:
+                            # Ensure it's a list and has items
+                            if isinstance(st.session_state.wikidata_results, list) and len(st.session_state.wikidata_results) > 0:
+                                wiki_entries = [f"- {r['label']}: {r['description']}" for r in st.session_state.wikidata_results[:3]]
+                                wiki_context = "Wikipedia/Wikidata entries found:\n" + "\n".join(wiki_entries) + "\n"
+                    except Exception as e:
+                        print(f"Wiki context error: {e}")
+                        wiki_context = ""
                     
                     # Build Reddit context
                     reddit_context = ""
