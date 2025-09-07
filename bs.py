@@ -1133,11 +1133,12 @@ def search_wikidata(query, limit=25):
     
     try:
         response = requests.get(url, params=params, timeout=10)
+        print(f"Wikidata API status: {response.status_code}")  # Debug
         if response.status_code == 200:
             data = response.json()
+            print(f"Wikidata raw results: {len(data.get('search', []))}")  # Debug
             all_results = []
             
-            # Collect all results without filtering
             for hit in data.get("search", []):
                 all_results.append({
                     "id": hit.get("id"),
@@ -1146,13 +1147,14 @@ def search_wikidata(query, limit=25):
                     "url": f"https://www.wikidata.org/wiki/{hit.get('id')}"
                 })
             
-            # Return all results - let Bailey decide what's relevant
             return all_results[:limit]
             
     except Exception as e:
         print(f"Wikidata search error: {e}")
+        return []
     
     return []
+
 
 def get_wikipedia_content(article_title, max_chars=3000):
     """Fetch actual Wikipedia article content"""
@@ -3734,6 +3736,8 @@ if st.session_state.current_page == "Case Search":
             status_text.text("Searching Wikipedia...")
             progress_bar.progress(10)
             wikidata_results = search_wikidata(case_search, 10)
+            st.write(f"Debug: Found {len(wikidata_results) if wikidata_results else 0} Wikidata results")  # Debug line
+
             
             status_text.text("Checking YouTube...")
             progress_bar.progress(25)
@@ -4364,7 +4368,7 @@ if st.session_state.current_page == "Case Search":
                     
                     # Build wiki context from wikidata results
                     wiki_context = ""
-                    if 'wikidata_results' in st.session_state and st.session_state.wikidata_results:
+                    if hasattr(st.session_state, 'wikidata_results') and st.session_state.wikidata_results:
                         wiki_entries = [f"- {r['label']}: {r['description']}" for r in st.session_state.wikidata_results[:3]]
                         wiki_context = "Wikipedia/Wikidata entries found:\n" + "\n".join(wiki_entries) + "\n"
                     
