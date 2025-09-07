@@ -3917,7 +3917,6 @@ if st.session_state.current_page == "Case Search":
         if not isinstance(youtube_count, int):
             youtube_count = 0
         nyt_results = st.session_state.nyt_results
-        youtube_count = st.session_state.youtube_count
         st.session_state.wikipedia_data = {'trend_percentage': 0, 'last_7_days': 0}  # Add dummy data
         wikipedia_data = st.session_state.wikipedia_data
         reddit_results = st.session_state.reddit_results
