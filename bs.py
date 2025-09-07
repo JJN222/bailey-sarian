@@ -3906,7 +3906,16 @@ if st.session_state.current_page == "Case Search":
         wikidata_results = get_cached_data('wikidata_results') or []
         gdelt_results = get_cached_data('gdelt_results') or []
         nyt_results = get_cached_data('nyt_results') or []
-        youtube_count = get_cached_data('youtube_count') or 0
+        # Fix the youtube_count issue
+        youtube_count_cached = get_cached_data('youtube_count')
+        if isinstance(youtube_count_cached, dict):
+            youtube_count = youtube_count_cached.get('data', 0) if youtube_count_cached else 0
+        else:
+            youtube_count = youtube_count_cached or 0
+        
+        # Make sure youtube_count is an integer
+        if not isinstance(youtube_count, int):
+            youtube_count = 0
         nyt_results = st.session_state.nyt_results
         youtube_count = st.session_state.youtube_count
         st.session_state.wikipedia_data = {'trend_percentage': 0, 'last_7_days': 0}  # Add dummy data
