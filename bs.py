@@ -1122,72 +1122,72 @@ def calculate_trending_score(upvotes, comments, created_utc):
 
 # ============ TRUE CRIME RESEARCH API FUNCTIONS ============
 
-def search_wikidata(query, limit=25):
-    """Search Wikidata for people, cases, or events"""
-    url = "https://www.wikidata.org/w/api.php"
-    params = {
-        "action": "wbsearchentities",
-        "search": query,
-        "language": "en",
-        "format": "json",
-        "type": "item",
-        "limit": limit,
-    }
+# def search_wikidata(query, limit=25):
+#     """Search Wikidata for people, cases, or events"""
+#     url = "https://www.wikidata.org/w/api.php"
+#     params = {
+#         "action": "wbsearchentities",
+#         "search": query,
+#         "language": "en",
+#         "format": "json",
+#         "type": "item",
+#         "limit": limit,
+#     }
     
-    try:
-        response = requests.get(url, params=params, timeout=10)
-        print(f"Wikidata API status: {response.status_code}")  # Debug
-        if response.status_code == 200:
-            data = response.json()
-            print(f"Wikidata raw results: {len(data.get('search', []))}")  # Debug
-            all_results = []
+#     try:
+#         response = requests.get(url, params=params, timeout=10)
+#         print(f"Wikidata API status: {response.status_code}")  # Debug
+#         if response.status_code == 200:
+#             data = response.json()
+#             print(f"Wikidata raw results: {len(data.get('search', []))}")  # Debug
+#             all_results = []
             
-            for hit in data.get("search", []):
-                all_results.append({
-                    "id": hit.get("id"),
-                    "label": hit.get("label", ""),
-                    "description": hit.get("description", ""),
-                    "url": f"https://www.wikidata.org/wiki/{hit.get('id')}"
-                })
+#             for hit in data.get("search", []):
+#                 all_results.append({
+#                     "id": hit.get("id"),
+#                     "label": hit.get("label", ""),
+#                     "description": hit.get("description", ""),
+#                     "url": f"https://www.wikidata.org/wiki/{hit.get('id')}"
+#                 })
             
-            return all_results[:limit]
+#             return all_results[:limit]
             
-    except Exception as e:
-        print(f"Wikidata search error: {e}")
-        return []
+#     except Exception as e:
+#         print(f"Wikidata search error: {e}")
+#         return []
     
-    return []
+#     return []
 
 
-def get_wikipedia_content(article_title, max_chars=3000):
-    """Fetch actual Wikipedia article content"""
-    import urllib.parse
+# def get_wikipedia_content(article_title, max_chars=3000):
+#     """Fetch actual Wikipedia article content"""
+#     import urllib.parse
     
-    # Use Wikipedia API to get article extract
-    url = "https://en.wikipedia.org/w/api.php"
-    params = {
-        "action": "query",
-        "format": "json",
-        "titles": article_title,
-        "prop": "extracts",
-        "exintro": True,  # Only the introduction
-        "explaintext": True,  # Plain text, no HTML
-        "exsectionformat": "plain",
-        "exchars": max_chars  # Limit characters
-    }
+#     # Use Wikipedia API to get article extract
+#     url = "https://en.wikipedia.org/w/api.php"
+#     params = {
+#         "action": "query",
+#         "format": "json",
+#         "titles": article_title,
+#         "prop": "extracts",
+#         "exintro": True,  # Only the introduction
+#         "explaintext": True,  # Plain text, no HTML
+#         "exsectionformat": "plain",
+#         "exchars": max_chars  # Limit characters
+#     }
     
-    try:
-        response = requests.get(url, params=params, timeout=10)
-        if response.status_code == 200:
-            data = response.json()
-            pages = data.get("query", {}).get("pages", {})
-            for page_id, page_data in pages.items():
-                if "extract" in page_data:
-                    return page_data["extract"]
-    except Exception as e:
-        print(f"Error fetching Wikipedia content: {e}")
+#     try:
+#         response = requests.get(url, params=params, timeout=10)
+#         if response.status_code == 200:
+#             data = response.json()
+#             pages = data.get("query", {}).get("pages", {})
+#             for page_id, page_data in pages.items():
+#                 if "extract" in page_data:
+#                     return page_data["extract"]
+#     except Exception as e:
+#         print(f"Error fetching Wikipedia content: {e}")
     
-    return ""
+#     return ""
 
 def search_with_gemini(query, gemini_api_key):
     """Use Gemini with grounding to search the real-time web"""
@@ -3736,14 +3736,9 @@ if st.session_state.current_page == "Case Search":
             status_text = st.empty()
             
             # Search all sources with progress updates
-            status_text.text("Searching Wikipedia...")
-            progress_bar.progress(10)
-            wikidata_results = search_wikidata(case_search, 10)
-            st.write(f"Debug: Found {len(wikidata_results) if wikidata_results else 0} Wikidata results")  # Debug line
-
             
             status_text.text("Checking YouTube...")
-            progress_bar.progress(25)
+            progress_bar.progress(20)
             youtube_count = count_youtube_videos(case_search, youtube_api_key) if youtube_api_key else 0
             
             status_text.text("Analyzing case...")
@@ -3900,7 +3895,7 @@ if st.session_state.current_page == "Case Search":
             # Store all results in session state
             st.session_state.search_performed = True
             st.session_state.search_query = case_search
-            cache_with_expiry('wikidata_results', wikidata_results, hours=24)
+            # cache_with_expiry('wikidata_results', wikidata_results, hours=24)
             cache_with_expiry('gdelt_results', [], hours=24)
             cache_with_expiry('nyt_results', [], hours=24)
             cache_with_expiry('youtube_count', youtube_count, hours=24)
@@ -3910,7 +3905,7 @@ if st.session_state.current_page == "Case Search":
     # Display results from session state
     if st.session_state.get('search_performed', False):
         case_search = st.session_state.search_query
-        wikidata_results = get_cached_data('wikidata_results') or []
+        # wikidata_results = get_cached_data('wikidata_results') or []
         gdelt_results = get_cached_data('gdelt_results') or []
         nyt_results = get_cached_data('nyt_results') or []
         # Fix the youtube_count issue
@@ -3978,7 +3973,7 @@ if st.session_state.current_page == "Case Search":
             
             # Then continue with your existing results display...
         
-        source_tabs = st.tabs(["Overview", "Web Search", "YouTube", "Reddit", "Wikipedia"])
+        source_tabs = st.tabs(["Overview", "Web Search", "YouTube", "Reddit"])
         
         with source_tabs[0]:  # Overview (Perplexity) - previously "Web Search"
             if web_search_results:
@@ -4297,51 +4292,51 @@ if st.session_state.current_page == "Case Search":
             else:
                 st.info("No Reddit discussions found")
 
-        with source_tabs[4]:  # Wikipedia
-            # Try Wikidata first
-            if wikidata_results:
-                st.markdown("#### Wikidata Entries")
-                for item in wikidata_results[:5]:
-                    st.write(f"**{item['label']}**")
-                    st.caption(f"{item['description']}")
-                    st.write(f"[View on Wikidata]({item['url']})")
-                    # Add Wikipedia link
-                    wiki_url = f"https://en.wikipedia.org/wiki/{item['label'].replace(' ', '_')}"
-                    st.write(f"[Search Wikipedia]({wiki_url})")
-                    st.divider()
+        # with source_tabs[4]:  # Wikipedia
+        #     # Try Wikidata first
+        #     if wikidata_results:
+        #         st.markdown("#### Wikidata Entries")
+        #         for item in wikidata_results[:5]:
+        #             st.write(f"**{item['label']}**")
+        #             st.caption(f"{item['description']}")
+        #             st.write(f"[View on Wikidata]({item['url']})")
+        #             # Add Wikipedia link
+        #             wiki_url = f"https://en.wikipedia.org/wiki/{item['label'].replace(' ', '_')}"
+        #             st.write(f"[Search Wikipedia]({wiki_url})")
+        #             st.divider()
             
-            # Always also try Wikipedia's own search API
-            st.markdown("#### Wikipedia Articles")
-            wiki_api_url = "https://en.wikipedia.org/w/api.php"
-            params = {
-                "action": "opensearch",
-                "search": case_search,
-                "limit": 5,
-                "format": "json"
-            }
+        #     # Always also try Wikipedia's own search API
+        #     st.markdown("#### Wikipedia Articles")
+        #     wiki_api_url = "https://en.wikipedia.org/w/api.php"
+        #     params = {
+        #         "action": "opensearch",
+        #         "search": case_search,
+        #         "limit": 5,
+        #         "format": "json"
+        #     }
             
-            try:
-                response = requests.get(wiki_api_url, params=params, timeout=10)
-                if response.status_code == 200:
-                    data = response.json()
-                    if len(data) > 1 and data[1]:  # data[1] contains titles
-                        for i, title in enumerate(data[1][:5]):
-                            # data[2] has descriptions, data[3] has URLs
-                            description = data[2][i] if len(data) > 2 and i < len(data[2]) else ""
-                            url = data[3][i] if len(data) > 3 and i < len(data[3]) else f"https://en.wikipedia.org/wiki/{title.replace(' ', '_')}"
+        #     try:
+        #         response = requests.get(wiki_api_url, params=params, timeout=10)
+        #         if response.status_code == 200:
+        #             data = response.json()
+        #             if len(data) > 1 and data[1]:  # data[1] contains titles
+        #                 for i, title in enumerate(data[1][:5]):
+        #                     # data[2] has descriptions, data[3] has URLs
+        #                     description = data[2][i] if len(data) > 2 and i < len(data[2]) else ""
+        #                     url = data[3][i] if len(data) > 3 and i < len(data[3]) else f"https://en.wikipedia.org/wiki/{title.replace(' ', '_')}"
                             
-                            st.write(f"**{title}**")
-                            if description:
-                                st.caption(description)
-                            st.write(f"[Read on Wikipedia]({url})")
-                            st.divider()
-                    else:
-                        st.info("No Wikipedia articles found")
-            except Exception as e:
-                st.info("Wikipedia search unavailable")
-                # Provide direct search link
-                wiki_search_url = f"https://en.wikipedia.org/w/index.php?search={case_search.replace(' ', '+')}"
-                st.markdown(f"[Search Wikipedia directly]({wiki_search_url})")
+        #                     st.write(f"**{title}**")
+        #                     if description:
+        #                         st.caption(description)
+        #                     st.write(f"[Read on Wikipedia]({url})")
+        #                     st.divider()
+        #             else:
+        #                 st.info("No Wikipedia articles found")
+        #     except Exception as e:
+        #         st.info("Wikipedia search unavailable")
+        #         # Provide direct search link
+        #         wiki_search_url = f"https://en.wikipedia.org/w/index.php?search={case_search.replace(' ', '+')}"
+        #         st.markdown(f"[Search Wikipedia directly]({wiki_search_url})")
 
         
         # Bailey's Strategy Generator
@@ -6256,6 +6251,3 @@ st.markdown("""
 if st.button("Privacy Policy", key="privacy_link"):
     st.session_state.current_page = "Privacy Policy"
     st.rerun()
-
-    # Temporary debug info
-st.write(f"Current page: {st.session_state.get('current_page', 'Not set')}")
